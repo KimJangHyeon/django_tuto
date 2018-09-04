@@ -4,16 +4,26 @@ from django.dispatch import receiver
 from django.conf import settings
 from rest_framework.authtoken.models import Token
 
+
 # Create your models here.
-class Users(models.Model):
-    uid = models.CharField(max_length=256)
-    pw = models.CharField(max_length=32)
-    contents = models.TextField()
+class MyUser(models.Model):
+    uid = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=256)
+    pw = models.CharField(max_length=1024)
+
+    REQUIRED_FIELDS = ['name', 'pw']
 
     def __str__(self):
-        return self.uid
+        return self.name
 
-    @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-    def create_auth_token(sender, instance=None, created=False, **kwargs):
-        if created:
-            Token.objects.create(user=instance)
+    #
+    # @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+    # def create_auth_token(sender, instance=None, created=False, **kwargs):
+    #     if created:
+    #         Token.objects.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
